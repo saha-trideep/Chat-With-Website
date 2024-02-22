@@ -15,7 +15,8 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 ####################################################################
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+google_api_key = os.getenv("GOOGLE_API_KEY")
+genai.configure(api_key=google_api_key)
 
 
 #######################################################################
