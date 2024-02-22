@@ -47,26 +47,26 @@ def conversational_rag_chain(retriever):
 
 # Initialize the vector store
 def get_vectorstore_from_url(url):
-    # Load the web page
-    loader = WebBaseLoader(url)
-    document = loader.load()
+        # Load the web page
+        loader = WebBaseLoader(url)
+        document = loader.load()
 
-    # Split the content into chunks
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
-        length_function=len,
-        is_separator_regex=False,
-    )
+        # Split the content into chunks
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len,
+            is_separator_regex=False,
+        )
 
-    chunks = text_splitter.split_documents(document)
-    
-    # Initialize the vector store
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    db = Chroma.from_documents(chunks, embeddings)
-    return db
+        chunks = text_splitter.split_documents(document)
+        
+        # Initialize the vector store
+        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        db = Chroma.from_documents(chunks, embeddings)
+        return db
 
-# Initialize the retriever
+    # Initialize the retriever
 def get_context_retriever_chain(db):
     # Initialize the retriever
     retriever = db.as_retriever()
@@ -88,7 +88,7 @@ def get_context_retriever_chain(db):
 
     return chain
 
-# Get response
+    # Get response
 def get_response(user_query):
     # Conversational RAG Chain
     retriever_chain = get_context_retriever_chain(st.session_state.vector_store)
@@ -104,51 +104,58 @@ def get_response(user_query):
     
     return response['answer']
 
-##########################################################################
 
-# Set page config
-st.set_page_config(
-    page_title="Chat with website",
-    page_icon="🤖",
-    layout="centered",   
-)
 
-# Set title
-st.title("Chat with website 👋 🤖")
+    ##########################################################################
 
-# Set sidebar
-with st.sidebar:
-    st.header("Settings")
-    website_url = st.text_input("Website URL",key="url")
 
-# Set chat history     
-if website_url is None or website_url == "":
-    st.info("Please enter a website URL.")  
+def main():
+    # Set page config
+    st.set_page_config(
+        page_title="Chat with website",
+        page_icon="🤖",
+        layout="centered",   
+    )
 
-else:
-    
-    if "chat_history" not in st.session_state:  
-        st.session_state.chat_history = [
-            AIMessage(content="Hello, how can I help you?"),
-        ]
-   
-    if "vector_store" not in st.session_state:
-        st.session_state.vector_store = get_vectorstore_from_url(website_url)
-    
-    # user input
-    user_query = st.chat_input("Ask a question", key="input")
+    # Set title
+    st.title("Chat with website 👋 🤖")
 
-    if user_query:
-        response = get_response(user_query)
+    # Set sidebar
+    with st.sidebar:
+        st.header("Settings")
+        website_url = st.text_input("Website URL",key="url")
+
+    # Set chat history     
+    if website_url is None or website_url == "":
+        st.info("Please enter a website URL.")  
+
+    else:
         
-        st.session_state.chat_history.append(HumanMessage(content=user_query))
-        st.session_state.chat_history.append(AIMessage(content=response))
+        if "chat_history" not in st.session_state:  
+            st.session_state.chat_history = [
+                AIMessage(content="Hello, how can I help you?"),
+            ]
     
-    # display chat history
-    for message in st.session_state.chat_history:
-        if isinstance(message, AIMessage):
-            with st.chat_message("AI"):
-                st.write(message.content)
-        else:
-            with st.chat_message("Human"):
-                st.write(message.content)
+        if "vector_store" not in st.session_state:
+            st.session_state.vector_store = get_vectorstore_from_url(website_url)
+        
+        # user input
+        user_query = st.chat_input("Ask a question", key="input")
+
+        if user_query:
+            response = get_response(user_query)
+            
+            st.session_state.chat_history.append(HumanMessage(content=user_query))
+            st.session_state.chat_history.append(AIMessage(content=response))
+        
+        # display chat history
+        for message in st.session_state.chat_history:
+            if isinstance(message, AIMessage):
+                with st.chat_message("AI"):
+                    st.write(message.content)
+            else:
+                with st.chat_message("Human"):
+                    st.write(message.content)
+
+if __name__ == "__main__":
+    main()
