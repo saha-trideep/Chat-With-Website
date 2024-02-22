@@ -15,12 +15,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 ####################################################################
 
 load_dotenv()
-# Load environment variables
-def google_api_key():
-    return os.getenv("GOOGLE_API_KEY")
-
-# Initialize Google Generative AI
-genai.configure(api_key=google_api_key())
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
 #######################################################################
