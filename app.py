@@ -57,7 +57,8 @@ def get_vectorstore_from_url(url):
         chunks = text_splitter.split_documents(document)
         
         # Initialize the vector store
-        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", 
+                                                google_api_key=google_api_key)
         db = Chroma.from_documents(chunks, embeddings)
         return db
 
